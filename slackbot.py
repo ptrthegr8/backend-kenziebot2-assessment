@@ -10,6 +10,7 @@ import logging.handlers
 import time
 import re
 import random
+import requests
 from settings import SLACK_BOT_TOKEN, BOT_ID
 from slackclient import SlackClient
 
@@ -144,7 +145,10 @@ def handle_command(command, channel):
                     random.randint(1, 100))
             }
         ]
-
+    if command.startswith("bitcoin"):
+        r = requests.get("https://api.coindesk.com/v1/bpi/currentprice.json")
+        r = r.json()['bpi']['USD']['rate']
+        response = 'The current Bitcoin price is: $' + r
     # Sends the response back to the channel
     logger.info('channel: {} response: {} attachments: {}'.format(
         channel, response, attachments))
