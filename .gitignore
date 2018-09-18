@@ -1,0 +1,6 @@
+slack_env/
+kenzie_pics/
+.vscode/
+.env
+*.log*
+*.pyc
