@@ -118,6 +118,9 @@ def handle_command(command, channel):
     if command.startswith(HELP_COMMAND):
         response = "Here are some basic commands:"
         attachments = [
+            {"title": "Current bitcoin rate in USD",
+                "text": "`bitcoin`",
+                "color": "#5780CD"},
             {"title": "random pic",
                 "text": "`pic`",
                 "color": "#5780CD"},
