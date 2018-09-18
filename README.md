@@ -6,14 +6,16 @@
 
 ### Beep
 
-## Phase 1 of Slackbot:
+## Phase 2 of Slackbot:
 1. Connects to Slack and announces presence.
 2. Responds to Direct Mentions e.g. @ptr_bot.
 3. Parses and responds to basic commands:
-*`hey jude`
-*`ping`
-*`help`
-*`exit`
-*`quit`
+> * `pic` - sends random pic
+> * `echo <text>` - repeats random users text
+> * `ping` - uptime of bot
+> * `help` - list of commands
+> * `exit` *or* `quit` - kills bot...sometimes
+    
+
 
 

@@ -9,7 +9,6 @@ import logging
 import logging.handlers
 import time
 import re
-import requests
 import random
 from settings import SLACK_BOT_TOKEN, BOT_ID
 from slackclient import SlackClient
@@ -47,14 +46,16 @@ start_time = time.time()
 
 def signal_handler(sig_num, frame):
     """
-    This is a handler for SIGTERM and SIGINT. Other signals can be mapped here as well (SIGHUP?)
-    Basically it just sets a global flag, and main() will exit it's loop if the signal is trapped.
+    This is a handler for SIGTERM and SIGINT.
+    With the global flag, and main() will exit its loop
+    if the signal is trapped.
     :param sig_num: The integer signal number that was trapped from the OS.
     :param frame: Not used
     :return None
     """
-    signames = dict((k, v) for v, k in reversed(sorted(signal.__dict__.items()))
-                    if v.startswith('SIG') and not v.startswith('SIG_'))
+    signames = dict((k, v) for v, k in reversed(
+        sorted(signal.__dict__.items()))
+        if v.startswith('SIG') and not v.startswith('SIG_'))
     logger.warn('Received {}'.format(signames[sig_num]))
     global exit_flag
     exit_flag = True
@@ -102,7 +103,8 @@ def handle_command(command, channel):
     attachments = None
     # This is where you start to implement more commands!
     if command.startswith(PING_COMMAND):
-        response = "Uptime {}".format(time.time() - start_time)
+        response = "I've been here for these many seconds: {}".format(
+            time.time() - start_time)
     if command.startswith(EXIT_COMMAND) or command.startswith(QUIT_COMMAND):
         goodbyes = ["I leave of my own accord.",
                     "Catch ya later, alligator.",
