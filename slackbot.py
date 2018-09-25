@@ -16,7 +16,7 @@ from slackclient import SlackClient
 
 # Sets up logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter(
     '%(asctime)s : %(name)s : %(levelname)s : %(threadName)s : %(message)s')
@@ -85,8 +85,10 @@ def parse_direct_mention(message_text):
         If there is no direct mention, returns None
     """
     matches = re.search(MENTION_REGEX, message_text)
-    # the first group contains the username,
+    # the first group contains the userid,
     # the second group contains the remaining message
+    logger.debug('userid: {} message: {}'.format(matches.group(1),
+                                                 matches.group(2).strip()))
     return ((matches.group(1), matches.group(2).strip())
             if matches else (None, None))
 
@@ -102,7 +104,9 @@ def handle_command(command, channel):
     # Finds and executes the given command, filling in response
     response = None
     attachments = None
-    # This is where you start to implement more commands!
+    # Here are all the commands!
+    if command is None:
+        raise Exception
     if command.startswith(PING_COMMAND):
         response = "I've been here for these many seconds: {}".format(
             time.time() - start_time)
@@ -112,8 +116,8 @@ def handle_command(command, channel):
                     "I'll be back.",
                     "No."]
         response = random.choice(goodbyes)
-        global exit_flag
         if response is not "No.":
+            global exit_flag
             exit_flag = True
     if command.startswith(HELP_COMMAND):
         response = "Here are some basic commands:"
@@ -153,7 +157,7 @@ def handle_command(command, channel):
         r = r.json()['bpi']['USD']['rate']
         response = 'The current Bitcoin price is: $' + r
     # Sends the response back to the channel
-    logger.info('channel: {} response: {} attachments: {}'.format(
+    logger.debug('channel: {} response: {} attachments: {}'.format(
         channel, response, attachments))
     slack_client.api_call(
         "chat.postMessage",
@@ -197,10 +201,14 @@ if __name__ == "__main__":
             try:
                 command, channel = parse_bot_commands(slack_client.rtm_read())
                 if command:
-                    logger.info(
+                    logger.debug(
                         'command: {}, channel: {}'.format(command, channel))
                     handle_command(command, channel)
                 time.sleep(RTM_READ_DELAY)
+            except slack_client.rtm_connect(with_team_state=False) is False:
+                logger.info(Exception)
+                time.sleep(5)
+                slack_client.rtm_connect(with_team_state=False)
             except Exception as e:
                 logger.info(e)
                 time.sleep(5)
