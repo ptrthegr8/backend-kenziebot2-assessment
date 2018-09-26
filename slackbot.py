@@ -40,6 +40,9 @@ PING_COMMAND = "ping"
 EXIT_COMMAND = "exit"
 QUIT_COMMAND = "quit"
 HELP_COMMAND = "help"
+ECHO_COMMAND = "echo"
+PIC_COMMAND = "pic"
+BITCOIN_COMMAND = "bitcoin"
 # variables
 exit_flag = False
 start_time = time.time()
@@ -142,9 +145,9 @@ def handle_command(command, channel):
                 "text": "`{}` or `{}`".format(EXIT_COMMAND, QUIT_COMMAND),
                 "color": "#5780CD"}
         ]
-    if command.startswith("echo"):
+    if command.startswith(ECHO_COMMAND):
         response = command[5:]
-    if command.startswith("pic"):
+    if command.startswith(PIC_COMMAND):
         response = "I'll just leave this here..."
         attachments = [
             {
@@ -153,7 +156,7 @@ def handle_command(command, channel):
                     random.randint(1, 100))
             }
         ]
-    if command.startswith("bitcoin"):
+    if command.startswith(BITCOIN_COMMAND):
         r = requests.get("https://api.coindesk.com/v1/bpi/currentprice.json")
         r = r.json()['bpi']['USD']['rate']
         response = 'The current Bitcoin price is: $' + r
@@ -193,8 +196,10 @@ if __name__ == "__main__":
                 # Runs through available channels and sends message
                 for c in list_channels():
                     slack_client.api_call("chat.postMessage",
-                                          channel=c["id"], text="Greetings "
-                                          "and salutations!")
+                                          channel=c["id"],
+                                          text="Greetings and salutations!",
+                                          icon_emoji=':robot_face:'
+                                          )
                     logger.info('channel name: {}, channel id: {},'.format(
                         c["name"], c["id"])
                         + ' msg: Greetings '
@@ -213,10 +218,6 @@ if __name__ == "__main__":
                                 command, channel))
                         handle_command(command, channel)
                     time.sleep(RTM_READ_DELAY)
-            else:
-                logger.info(
-                    "Connection failed. Exception traceback printed above.")
-                time.sleep(5)
         except Exception as e:
             logger.error(e)
             logger.info("Error connecting...retrying")
