@@ -87,8 +87,9 @@ def parse_direct_mention(message_text):
     matches = re.search(MENTION_REGEX, message_text)
     # the first group contains the userid,
     # the second group contains the remaining message
-    logger.debug('userid: {} message: {}'.format(matches.group(1),
-                                                 matches.group(2).strip()))
+    if matches:
+        logger.debug('userid: {} message: {}'.format(matches.group(1),
+                                                     matches.group(2).strip()))
     return ((matches.group(1), matches.group(2).strip())
             if matches else (None, None))
 
@@ -185,33 +186,35 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     # if slack_client connects, then do the things
-    if slack_client.rtm_connect(with_team_state=False):
-        logger.info("ptr_bot connected and running!")
-        # Runs through available channels and sends message
-        # for c in list_channels():
-        #     # print c["name"], c["id"]
-        #     slack_client.api_call("chat.postMessage",
-        #                           channel=c["id"], text="Hello World!")
-        #     logger.info('channel name: {}, channel id: {},'.format(
-        #         c["name"], c["id"]) + ' msg: Hello World!')
-        # Read bot's user ID by calling Web API method `auth.test`
-        slackbot_id = slack_client.api_call("auth.test")["user_id"]
-        logger.info('slackbot_id: {}'.format(slackbot_id))
-        while not exit_flag:
-            try:
-                command, channel = parse_bot_commands(slack_client.rtm_read())
-                if command:
-                    logger.debug(
-                        'command: {}, channel: {}'.format(command, channel))
-                    handle_command(command, channel)
-                time.sleep(RTM_READ_DELAY)
-            except slack_client.rtm_connect(with_team_state=False) is False:
-                logger.info(Exception)
+    while not exit_flag:
+        try:
+            if slack_client.rtm_connect(with_team_state=False):
+                logger.info("ptr_bot connected and running!")
+                # Runs through available channels and sends message
+                for c in list_channels():
+                    slack_client.api_call("chat.postMessage",
+                                          channel=c["id"], text="Greetings and salutations!")
+                    logger.info('channel name: {}, channel id: {},'.format(
+                        c["name"], c["id"]) + 'msg: Greetings and salutations!')
+                # Read bot's user ID by calling Web API method `auth.test`
+                slackbot_id = slack_client.api_call("auth.test")["user_id"]
+                logger.info('slackbot_id: {}'.format(slackbot_id))
+                while not exit_flag:
+                    slack_client.api_call("apt.test")
+                    command, channel = parse_bot_commands(
+                        slack_client.rtm_read())
+                    if command:
+                        logger.debug(
+                            'command: {}, channel: {}'.format(
+                                command, channel))
+                        handle_command(command, channel)
+                    time.sleep(RTM_READ_DELAY)
+            else:
+                logger.info(
+                    "Connection failed. Exception traceback printed above.")
                 time.sleep(5)
-                slack_client.rtm_connect(with_team_state=False)
-            except Exception as e:
-                logger.info(e)
-                time.sleep(5)
-        logger.info("Uptime: {}".format(time.time() - start_time))
-    else:
-        print "Connection failed. Exception traceback printed above."
+        except Exception as e:
+            logger.error(e)
+            logger.info("Error connecting...retrying")
+            time.sleep(5)
+    logger.info("Uptime: {}".format(time.time() - start_time))
