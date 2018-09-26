@@ -22,7 +22,7 @@ formatter = logging.Formatter(
     '%(asctime)s : %(name)s : %(levelname)s : %(threadName)s : %(message)s')
 
 file_handler = logging.handlers.RotatingFileHandler(
-    'slackbot.log', maxBytes=10000, backupCount=2)
+    'slackbot.log', maxBytes=5*1024*1024, backupCount=2)
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
@@ -193,9 +193,13 @@ if __name__ == "__main__":
                 # Runs through available channels and sends message
                 for c in list_channels():
                     slack_client.api_call("chat.postMessage",
-                                          channel=c["id"], text="Greetings and salutations!")
+                                          channel=c["id"], text="Greetings"
+                                          "and salutations!")
                     logger.info('channel name: {}, channel id: {},'.format(
-                        c["name"], c["id"]) + 'msg: Greetings and salutations!')
+                        c["name"], c["id"])
+                        + ' msg: Greetings '
+                        + 'and salutations!'
+                    )
                 # Read bot's user ID by calling Web API method `auth.test`
                 slackbot_id = slack_client.api_call("auth.test")["user_id"]
                 logger.info('slackbot_id: {}'.format(slackbot_id))
