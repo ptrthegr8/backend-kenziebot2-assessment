@@ -193,7 +193,7 @@ if __name__ == "__main__":
                 # Runs through available channels and sends message
                 for c in list_channels():
                     slack_client.api_call("chat.postMessage",
-                                          channel=c["id"], text="Greetings"
+                                          channel=c["id"], text="Greetings "
                                           "and salutations!")
                     logger.info('channel name: {}, channel id: {},'.format(
                         c["name"], c["id"])
