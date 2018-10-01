@@ -110,11 +110,11 @@ def handle_command(command, channel):
     attachments = None
     # Here are all the commands!
     if command is None:
-        raise Exception
-    if command.startswith(PING_COMMAND):
+        raise Exception("Command was None")
+    elif command.startswith(PING_COMMAND):
         response = "I've been here for these many seconds: {}".format(
             time.time() - start_time)
-    if command.startswith(EXIT_COMMAND) or command.startswith(QUIT_COMMAND):
+    elif command.startswith(EXIT_COMMAND) or command.startswith(QUIT_COMMAND):
         goodbyes = ["I leave of my own accord.",
                     "Catch ya later, alligator.",
                     "I'll be back.",
@@ -123,7 +123,7 @@ def handle_command(command, channel):
         if response is not "No.":
             global exit_flag
             exit_flag = True
-    if command.startswith(HELP_COMMAND):
+    elif command.startswith(HELP_COMMAND):
         response = "Here are some basic commands:"
         attachments = [
             {"title": "Current bitcoin rate in USD",
@@ -145,9 +145,9 @@ def handle_command(command, channel):
                 "text": "`{}` or `{}`".format(EXIT_COMMAND, QUIT_COMMAND),
                 "color": "#5780CD"}
         ]
-    if command.startswith(ECHO_COMMAND):
+    elif command.startswith(ECHO_COMMAND):
         response = command[5:]
-    if command.startswith(PIC_COMMAND):
+    elif command.startswith(PIC_COMMAND):
         response = "I'll just leave this here..."
         attachments = [
             {
@@ -156,7 +156,7 @@ def handle_command(command, channel):
                     random.randint(1, 100))
             }
         ]
-    if command.startswith(BITCOIN_COMMAND):
+    elif command.startswith(BITCOIN_COMMAND):
         r = requests.get("https://api.coindesk.com/v1/bpi/currentprice.json")
         r = r.json()['bpi']['USD']['rate']
         response = 'The current Bitcoin price is: $' + r
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                 slackbot_id = slack_client.api_call("auth.test")["user_id"]
                 logger.info('slackbot_id: {}'.format(slackbot_id))
                 while not exit_flag:
-                    slack_client.api_call("apt.test")
+                    slack_client.api_call("api.test")
                     command, channel = parse_bot_commands(
                         slack_client.rtm_read())
                     if command:
